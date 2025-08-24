@@ -10,6 +10,12 @@ vim.opt.termguicolors = true
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
+vim.opt.spell = true
+vim.opt.spelllang = { "en_us" }
+
+vim.opt.number = true         -- Shows absolute line number on the current line
+vim.opt.relativenumber = true -- Shows relative numbers on all other lines
+
 vim.o.background = "dark"
 vim.o.laststatus = 2
 vim.o.statusline = "%m%r%h%w [%{mode()}] %f %y %=%l:%c"
@@ -31,6 +37,12 @@ vim.opt.rtp:prepend(lazypath)
 -- ========== Plugin Setup ==========
 require("lazy").setup({
         -- In your plugins table
+        {
+                "akinsho/toggleterm.nvim",
+                version = "*",
+                config = true
+        },
+
         {
                 "windwp/nvim-autopairs",
                 event = "InsertEnter",
@@ -153,6 +165,14 @@ require("lazy").setup({
                                                         capabilities = capabilities,
                                                         settings = {
                                                                 gopls = {
+                                                                        codelenses = {
+                                                                                generate = true, -- for 'go generate'
+                                                                                gc_details = true,
+                                                                                test = true,
+                                                                                tidy = true,
+                                                                                upgrade_dependency = true,
+                                                                                vendor = true,
+                                                                        },
                                                                         gofumpt = true,
                                                                         staticcheck = true,
                                                                         analyses = {
@@ -323,3 +343,33 @@ vim.keymap.set("i", "<C-k>", function()
 end, { desc = "LSP Hover in insert mode" })
 vim.keymap.set("i", "<C-z>", "<C-o>u", { desc = "Undo in insert mode" })
 vim.keymap.set("i", "<C-s>", "<Esc>:w<CR>a", { silent = true, desc = "Save in insert mode" })
+
+vim.keymap.set("n", "<leader>a", ":%y+<CR>", { desc = "Copy Entire File" })
+vim.keymap.set("n", "<leader>aa", "gg0vG$y", { desc = "Select and copy all" })
+vim.keymap.set("n", "<leader>d", "<cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
+vim.keymap.set("n", "<leader>gt", function()
+        local file = vim.fn.expand("<cfile>")
+        vim.cmd("tabedit " .. file)
+end, { desc = "Open file under cursor in new tab" })
+vim.keymap.set("n", "<leader>h", "<C-w>h", { desc = "Window left" })
+vim.keymap.set("n", "<leader>j", "<C-w>j", { desc = "Window down" })
+vim.keymap.set("n", "<leader>k", "<C-w>k", { desc = "Window up" })
+vim.keymap.set("n", "<leader>l", "<C-w>l", { desc = "Window right" })
+im.keymap.set("n", "$", "$", { noremap = true })
+vim.api.nvim_set_hl(0, "SpellBad", { underline = true, sp = "#0000FF" })
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+        callback = function()
+                vim.lsp.codelens.refresh()
+        end,
+})
+vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+                local client = vim.lsp.get_client_by_id(args.data.client_id)
+                if client.supports_method("textDocument/codeLens") then
+                        vim.lsp.codelens.refresh()
+                end
+        end,
+})
+
+
+vim.keymap.set("n", "9", "$", { noremap = true, silent = true })
