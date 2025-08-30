@@ -355,7 +355,7 @@ vim.keymap.set("n", "<leader>h", "<C-w>h", { desc = "Window left" })
 vim.keymap.set("n", "<leader>j", "<C-w>j", { desc = "Window down" })
 vim.keymap.set("n", "<leader>k", "<C-w>k", { desc = "Window up" })
 vim.keymap.set("n", "<leader>l", "<C-w>l", { desc = "Window right" })
-im.keymap.set("n", "$", "$", { noremap = true })
+vim.keymap.set("n", "$", "$", { noremap = true })
 vim.api.nvim_set_hl(0, "SpellBad", { underline = true, sp = "#0000FF" })
 vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
         callback = function()
